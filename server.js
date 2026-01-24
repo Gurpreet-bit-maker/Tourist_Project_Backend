@@ -34,6 +34,7 @@ app.use(
 let SignUpModel = require("./Models/signUpModel");
 let dummyTourData = require("./exampleData");
 let flightData = require("./Data/flightData");
+let bookedData = require("./Models/bookedFlights");
 // *static data
 app.use("/Tourist", express.static("public/Tourist"));
 
@@ -60,7 +61,7 @@ app.post("/user/login", async (req, res) => {
   try {
     let { userName, userPassword } = req.body;
     let userData = await SignUpModel.findOne({
-      $or: [{ userName: userName }, { userEame: userName }],
+      $or: [{ userName: userName }, { userEmail: userName }],
     });
     if (!userData) return res.status(400).json({ message: "User Not Found" });
     let dcryptPassword = await bcrypt.compare(
@@ -87,36 +88,76 @@ let authRoute = (req, res, next) => {
     let tokenResult = jwt.verify(token, process.env.JWT_SECRET);
     if (!tokenResult) return res.json("you need login again");
     req.user = tokenResult;
-
+    // console.log(tokenResult);
     next();
   } catch (error) {
-    console.log(error);
+    res.status(401).json({ message: "please login" });
   }
 };
 
 // ! Protected Route
-// Profile Get Route
-app.get("/profile", authRoute, async (req, res) => {
+// Store Bookings
+app.post("/user/book", authRoute, async (req, res) => {
   try {
-    let userData = await SignUpModel.findOne({ userId: req.user.userId });
-    res.json(userData);
+    let {
+      airline,
+      arrivalTime,
+      departureTime,
+      booked,
+      duration,
+      from,
+      to,
+
+      availableSeats,
+      stops,
+    } = req.body;
+    console.log(req.body);
+    let bookedF = await bookedData.create({
+      airline: airline,
+      arrivalTime: arrivalTime,
+      departureTime: departureTime,
+      booked: booked,
+      duration: duration,
+      from: from,
+      to: to,
+      userId: req.user.userId,
+      availableSeats: availableSeats,
+      stops: stops,
+    });
+    console.log(bookedF);
+    res.status(201).json("working");
   } catch (error) {
     console.log(error);
   }
 });
-
-
+// Profile
+app.get("/user/profile", authRoute, async (req, res) => {
+  try {
+    let profileData = await SignUpModel.findOne({ _id: req.user.userId });
+    res.status(201).json(profileData);
+  } catch (error) {
+    console.log("profile not");
+  }
+});
+// Bookings
+app.get("/user/bookings", authRoute, async (req, res) => {
+  try {
+    let bookings = await bookedData.findOne({ userId: req.user.userId });
+    console.log(bookings);
+    res.status(201).json(bookings);
+  } catch (error) {
+    res.status(400).json({ message: "no any bookings" });
+  }
+});
 // ! get Tour api
 // get tour apis
 app.get("/user/gettour", (req, res) => {
-  console.log(dummyTourData);
   res.json(dummyTourData);
 });
-app.get("/user/flight", (req,res) => 
-{
+app.get("/user/flight", (req, res) => {
   res.json(flightData);
-})
-
+});
+let PORT = process.env.PORT || 8080;
 //! server port
 app.listen(8080, () => {
   console.log(`Listning Port On 8080`);
