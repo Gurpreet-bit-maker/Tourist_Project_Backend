@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://tourist-project-backend.onrender.com"], // frontend URL
+    origin: "*", // frontend URL
     credentials: true, // mandatory for cookies
   }),
 );
