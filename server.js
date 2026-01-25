@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://tourist-project-backend.onrender.com"], // frontend URL
+    origin: true,
     credentials: true, // mandatory for cookies
   }),
 );
@@ -86,7 +86,7 @@ let authRoute = (req, res, next) => {
   try {
     let token = req.cookies.userToken;
     let tokenResult = jwt.verify(token, process.env.JWT_SECRET);
-    if (!tokenResult) return res.json("you need login again");
+    if (!tokenResult) return res.json("token expire");
     req.user = tokenResult;
     // console.log(tokenResult);
     next();
@@ -149,6 +149,43 @@ app.get("/user/bookings", authRoute, async (req, res) => {
     res.status(400).json({ message: "no any bookings" });
   }
 });
+// Store best bookings
+app.post("/user/name", async (req, res) => {
+  console.log(req.body);
+
+  try {
+    // let {
+    //   airline,
+    //   arrivalTime,
+    //   departureTime,
+    //   booked,
+    //   duration,
+    //   from,
+    //   to,
+    //   availableSeats,
+    //   stops,
+    // } = req.body;
+    // let bookedF = await bookedData.create({
+    //   airline: airline,
+    //   arrivalTime: arrivalTime,
+    //   departureTime: departureTime,
+    //   booked: booked,
+    //   duration: duration,
+    //   from: from,
+    //   to: to,
+    //   userId: req.user.userId,
+    //   availableSeats: availableSeats,
+    //   stops: stops,
+    // });
+    // console.log(bookedF);
+    // res.status(201).json(bookedF);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "bad request" });
+  }
+});
+
+
 // ! get Tour api
 // get tour apis
 app.get("/user/gettour", (req, res) => {
