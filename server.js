@@ -33,7 +33,7 @@ app.use(
 // * All models
 let SignUpModel = require("./Models/signUpModel");
 let dummyTourData = require("./exampleData");
-let flightData = require("./Data/flightData");
+let flightData = require("./datas/flight");
 let bookedData = require("./Models/bookedFlights");
 // *static data
 app.use("/Tourist", express.static("public/Tourist"));
