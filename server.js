@@ -150,52 +150,56 @@ app.get("/user/bookings", authRoute, async (req, res) => {
   }
 });
 // Store best bookings
-app.post("/user/name", async (req, res) => {
-  console.log(req.body);
+// app.get("/user/name", async (req, res) => {
 
-  try {
-    // let {
-    //   airline,
-    //   arrivalTime,
-    //   departureTime,
-    //   booked,
-    //   duration,
-    //   from,
-    //   to,
-    //   availableSeats,
-    //   stops,
-    // } = req.body;
-    // let bookedF = await bookedData.create({
-    //   airline: airline,
-    //   arrivalTime: arrivalTime,
-    //   departureTime: departureTime,
-    //   booked: booked,
-    //   duration: duration,
-    //   from: from,
-    //   to: to,
-    //   userId: req.user.userId,
-    //   availableSeats: availableSeats,
-    //   stops: stops,
-    // });
-    // console.log(bookedF);
-    // res.status(201).json(bookedF);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "bad request" });
-  }
-});
-
+//   try {
+//     res.json("hello");
+//     // let {
+//     //   airline,
+//     //   arrivalTime,
+//     //   departureTime,
+//     //   booked,
+//     //   duration,
+//     //   from,
+//     //   to,
+//     //   availableSeats,
+//     //   stops,
+//     // } = req.body;
+//     // let bookedF = await bookedData.create({
+//     //   airline: airline,
+//     //   arrivalTime: arrivalTime,
+//     //   departureTime: departureTime,
+//     //   booked: booked,
+//     //   duration: duration,
+//     //   from: from,
+//     //   to: to,
+//     //   userId: req.user.userId,
+//     //   availableSeats: availableSeats,
+//     //   stops: stops,
+//     // });
+//     // console.log(bookedF);
+//     // res.status(201).json(bookedF);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(400).json({ message: "bad request" });
+//   }
+// });
 
 // ! get Tour api
 // get tour apis
 app.get("/user/gettour", (req, res) => {
   res.json(dummyTourData);
 });
+
+app.post("/user/expensiveflights", (req, res) => {
+  console.log(req.body)
+});
+
 app.get("/user/flight", (req, res) => {
   res.json(flightData);
 });
-let PORT = process.env.PORT || 8080;
+let PORT = process.env.PORT || 5000;
 //! server port
 app.listen(PORT, () => {
-  console.log(`Listning Port On 8080`);
+  console.log(`Listning Port On ${PORT}`);
 });
