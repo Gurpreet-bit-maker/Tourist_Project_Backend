@@ -11,6 +11,8 @@ let bookedFlightSchema = new mongoose.Schema({
   userId: String,
   availableSeats: Number,
   stops: Number,
+  price: String,
+  persons: String,
 });
 
 let Bookf = mongoose.model("Bookf", bookedFlightSchema);

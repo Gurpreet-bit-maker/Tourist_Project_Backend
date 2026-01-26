@@ -74,8 +74,13 @@ app.post("/user/login", async (req, res) => {
     let userToken = jwt.sign({ userId }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.cookie("userToken", userToken);
-    res.status(201).json({ message: "working" });
+    res.cookie("userToken", userToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 3600000,
+    });
+    res.status(201).json(req.body);
   } catch (error) {
     console.log(error);
   }
@@ -88,10 +93,11 @@ let authRoute = (req, res, next) => {
     let tokenResult = jwt.verify(token, process.env.JWT_SECRET);
     if (!tokenResult) return res.json("token expire");
     req.user = tokenResult;
-    // console.log(tokenResult);
+    console.log(tokenResult);
     next();
   } catch (error) {
-    res.status(401).json({ message: "please login" });
+    console.log(error);
+    res.status(401).json("login");
   }
 };
 
@@ -135,6 +141,7 @@ app.get("/user/profile", authRoute, async (req, res) => {
   try {
     let profileData = await SignUpModel.findOne({ _id: req.user.userId });
     res.status(201).json(profileData);
+    console.log(profileData);
   } catch (error) {
     console.log("profile not");
   }
@@ -149,41 +156,6 @@ app.get("/user/bookings", authRoute, async (req, res) => {
     res.status(400).json({ message: "no any bookings" });
   }
 });
-// Store best bookings
-// app.get("/user/name", async (req, res) => {
-
-//   try {
-//     res.json("hello");
-//     // let {
-//     //   airline,
-//     //   arrivalTime,
-//     //   departureTime,
-//     //   booked,
-//     //   duration,
-//     //   from,
-//     //   to,
-//     //   availableSeats,
-//     //   stops,
-//     // } = req.body;
-//     // let bookedF = await bookedData.create({
-//     //   airline: airline,
-//     //   arrivalTime: arrivalTime,
-//     //   departureTime: departureTime,
-//     //   booked: booked,
-//     //   duration: duration,
-//     //   from: from,
-//     //   to: to,
-//     //   userId: req.user.userId,
-//     //   availableSeats: availableSeats,
-//     //   stops: stops,
-//     // });
-//     // console.log(bookedF);
-//     // res.status(201).json(bookedF);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(400).json({ message: "bad request" });
-//   }
-// });
 
 // ! get Tour api
 // get tour apis
@@ -191,8 +163,41 @@ app.get("/user/gettour", (req, res) => {
   res.json(dummyTourData);
 });
 
-app.post("/user/expensiveflights", (req, res) => {
-  console.log(req.body)
+app.post("/user/bestflight", authRoute, async (req, res) => {
+  try {
+    let {
+      airline,
+      arrivalTime,
+      departureTime,
+      booked,
+      duration,
+      from,
+      to,
+      availableSeats,
+      stops,
+      price,
+      persons,
+    } = req.body;
+    let bookedF = await bookedData.create({
+      airline: airline,
+      arrivalTime: arrivalTime,
+      departureTime: departureTime,
+      booked: booked,
+      duration: duration,
+      from: from,
+      to: to,
+      userId: req.user.userId,
+      availableSeats: availableSeats,
+      stops: stops,
+      price: price,
+      persons: persons,
+    });
+    console.log(bookedF);
+    res.status(201).json(bookedF);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "bad request" });
+  }
 });
 
 app.get("/user/flight", (req, res) => {
