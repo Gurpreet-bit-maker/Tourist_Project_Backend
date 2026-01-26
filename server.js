@@ -157,49 +157,14 @@ app.get("/user/bookings", authRoute, async (req, res) => {
   }
 });
 
+app.post("/user/common", authRoute, async (req, res) => {
+  res.json(req.body);
+});
+
 // ! get Tour api
-// get tour apis
 app.get("/user/gettour", (req, res) => {
   res.json(dummyTourData);
 });
-
-app.post("/user/bestflight", authRoute, async (req, res) => {
-  try {
-    let {
-      airline,
-      arrivalTime,
-      departureTime,
-      booked,
-      duration,
-      from,
-      to,
-      availableSeats,
-      stops,
-      price,
-      persons,
-    } = req.body;
-    let bookedF = await bookedData.create({
-      airline: airline,
-      arrivalTime: arrivalTime,
-      departureTime: departureTime,
-      booked: booked,
-      duration: duration,
-      from: from,
-      to: to,
-      userId: req.user.userId,
-      availableSeats: availableSeats,
-      stops: stops,
-      price: price,
-      persons: persons,
-    });
-    console.log(bookedF);
-    res.status(201).json(bookedF);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "bad request" });
-  }
-});
-
 app.get("/user/flight", (req, res) => {
   res.json(flightData);
 });
@@ -208,3 +173,38 @@ let PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Listning Port On ${PORT}`);
 });
+
+// try {
+//   let {
+//     airline,
+//     arrivalTime,
+//     departureTime,
+//     booked,
+//     duration,
+//     from,
+//     to,
+//     availableSeats,
+//     stops,
+//     price,
+//     persons,
+//   } = req.body;
+//   let bookedF = await bookedData.create({
+//     airline: airline,
+//     arrivalTime: arrivalTime,
+//     departureTime: departureTime,
+//     booked: booked,
+//     duration: duration,
+//     from: from,
+//     to: to,
+//     userId: req.user.userId,
+//     availableSeats: availableSeats,
+//     stops: stops,
+//     price: price,
+//     persons: persons,
+//   });
+//   console.log(bookedF);
+//   res.status(201).json(bookedF);
+// } catch (error) {
+//   console.log(error);
+//   res.status(400).json({ message: "bad request" });
+// }
