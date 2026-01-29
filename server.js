@@ -57,6 +57,8 @@ app.post("/user/signup", async (req, res) => {
   }
 });
 // login Route
+let loginYes = null;
+
 app.post("/user/login", async (req, res) => {
   try {
     let { userName, userPassword } = req.body;
@@ -80,12 +82,18 @@ app.post("/user/login", async (req, res) => {
       sameSite: "none",
       maxAge: 3600000,
     });
+    loginYes = "yes";
     res.status(201).json(req.body);
   } catch (error) {
     console.log(error);
   }
 });
 
+// logout
+app.post("user/signout",async (req, res) => {
+  console.log(req.userId);
+  res.json("good");
+});
 // * auth middleware
 let authRoute = (req, res, next) => {
   try {
