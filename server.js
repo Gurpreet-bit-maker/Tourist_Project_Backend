@@ -90,8 +90,8 @@ app.post("/user/login", async (req, res) => {
 });
 
 // logout
-app.post("/user/signout", async (req, res) => {
-  res.json("working");
+app.post("/user/sig", (req, res) => {
+  console.log("hello");
 });
 // * auth middleware
 let authRoute = (req, res, next) => {
