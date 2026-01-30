@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: true,
+    origin: ["http://localhost:5000", "https://tourist-project-backend.onrender.com"],
     credentials: true, // mandatory for cookies
   }),
 );
@@ -44,7 +44,6 @@ app.post("/user/signup", async (req, res) => {
   try {
     let { userName, userEmail, userPhone, userPassword } = req.body;
     let dcryptPassword = await bcrypt.hash(userPassword, 10);
-
     let storeData = await SignUpModel.create({
       userName: userName,
       userEmail: userEmail,
@@ -57,7 +56,6 @@ app.post("/user/signup", async (req, res) => {
   }
 });
 // login Route
-let loginYes = null;
 
 app.post("/user/login", async (req, res) => {
   try {
@@ -90,9 +88,7 @@ app.post("/user/login", async (req, res) => {
 });
 
 // logout
-app.post("/user/sig", (req, res) => {
-  console.log("hello");
-});
+
 // * auth middleware
 let authRoute = (req, res, next) => {
   try {
@@ -147,8 +143,8 @@ app.post("/user/book", authRoute, async (req, res) => {
 app.get("/user/profile", authRoute, async (req, res) => {
   try {
     let profileData = await SignUpModel.findOne({ _id: req.user.userId });
+    console.log(req.user.userId);
     res.status(201).json(profileData);
-    console.log(profileData);
   } catch (error) {
     console.log("profile not");
   }
@@ -163,9 +159,42 @@ app.get("/user/bookings", authRoute, async (req, res) => {
     res.status(400).json({ message: "no any bookings" });
   }
 });
+// Bookings best flight
+app.post("/user/best", authRoute, async (req, res) => {
+  try {
+    let {
+      airline,
+      arrivalTime,
+      departureTime,
+      booked,
+      duration,
+      from,
+      to,
 
-app.post("/user/common", authRoute, async (req, res) => {
-  res.json(req.body);
+      availableSeats,
+      stops,
+      price,
+      persons,
+    } = req.body;
+    let bookedF = await bookedData.create({
+      airline: airline,
+      arrivalTime: arrivalTime,
+      departureTime: departureTime,
+      booked: booked,
+      duration: duration,
+      from: from,
+      to: to,
+      userId: req.user.userId,
+      availableSeats: availableSeats,
+      stops: stops,
+      price: price,
+      persons: persons,
+    });
+    console.log(bookedF);
+    res.status(201).json("working");
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // ! get Tour api
@@ -176,6 +205,7 @@ app.get("/user/flight", (req, res) => {
   res.json(flightData);
 });
 let PORT = process.env.PORT || 5000;
+
 //! server port
 app.listen(PORT, () => {
   console.log(`Listning Port On ${PORT}`);
