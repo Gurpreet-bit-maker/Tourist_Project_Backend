@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost:5000", "https://tourist-project-backend.onrender.com"],
+    origin: true,
     credentials: true, // mandatory for cookies
   }),
 );
@@ -60,6 +60,7 @@ app.post("/user/signup", async (req, res) => {
 app.post("/user/login", async (req, res) => {
   try {
     let { userName, userPassword } = req.body;
+
     let userData = await SignUpModel.findOne({
       $or: [{ userName: userName }, { userEmail: userName }],
     });
@@ -80,8 +81,9 @@ app.post("/user/login", async (req, res) => {
       sameSite: "none",
       maxAge: 3600000,
     });
-    loginYes = "yes";
-    res.status(201).json(req.body);
+    console.log(userToken);
+    console.log(req.body);
+    res.status(201).json("now you are login for 1 hour");
   } catch (error) {
     console.log(error);
   }
@@ -100,7 +102,7 @@ let authRoute = (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
-    res.status(401).json("login");
+    res.status(401).json("please Login");
   }
 };
 
@@ -152,7 +154,7 @@ app.get("/user/profile", authRoute, async (req, res) => {
 // Bookings
 app.get("/user/bookings", authRoute, async (req, res) => {
   try {
-    let bookings = await bookedData.findOne({ userId: req.user.userId });
+    let bookings = await bookedData.find({ userId: req.user.userId });
     console.log(bookings);
     res.status(201).json(bookings);
   } catch (error) {
@@ -161,6 +163,10 @@ app.get("/user/bookings", authRoute, async (req, res) => {
 });
 // Bookings best flight
 app.post("/user/best", authRoute, async (req, res) => {
+  let checkMaxLimit = await bookedData.find({ userId: req.user.userId });
+  if (checkMaxLimit.length >= 2) {
+    return res.json({ message: "length is full" });
+  }
   try {
     let {
       airline,
@@ -176,7 +182,7 @@ app.post("/user/best", authRoute, async (req, res) => {
       price,
       persons,
     } = req.body;
-    let bookedF = await bookedData.create({
+    let bestBook = await bookedData.create({
       airline: airline,
       arrivalTime: arrivalTime,
       departureTime: departureTime,
@@ -190,11 +196,21 @@ app.post("/user/best", authRoute, async (req, res) => {
       price: price,
       persons: persons,
     });
-    console.log(bookedF);
-    res.status(201).json("working");
+    // console.log(bestBook);
+    res.status(201).json(bestBook);
   } catch (error) {
     console.log(error);
   }
+});
+// Events
+app.get("/user/events", authRoute, async (req, res) => {
+  try {
+    let eventData = await bookedData.find({ _id: req.user.userId });
+    res.json(eventData);
+  } catch (error) {
+    console.log(error);
+  }
+  res.json();
 });
 
 // ! get Tour api
