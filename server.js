@@ -80,9 +80,9 @@ app.post("/user/login", async (req, res) => {
       secure: true,
       sameSite: "none",
       maxAge: 3600000,
+      path: "/",
     });
-    console.log(userToken);
-    console.log(req.body);
+    
     res.status(201).json("now you are login for 1 hour");
   } catch (error) {
     console.log(error);
@@ -98,7 +98,7 @@ let authRoute = (req, res, next) => {
     let tokenResult = jwt.verify(token, process.env.JWT_SECRET);
     if (!tokenResult) return res.json("token expire");
     req.user = tokenResult;
-    console.log(tokenResult);
+    
     next();
   } catch (error) {
     console.log(error);
@@ -135,7 +135,7 @@ app.post("/user/book", authRoute, async (req, res) => {
       availableSeats: availableSeats,
       stops: stops,
     });
-    console.log(bookedF);
+    
     res.status(201).json("working");
   } catch (error) {
     console.log(error);
@@ -145,7 +145,6 @@ app.post("/user/book", authRoute, async (req, res) => {
 app.get("/user/profile", authRoute, async (req, res) => {
   try {
     let profileData = await SignUpModel.findOne({ _id: req.user.userId });
-    console.log(req.user.userId);
     res.status(201).json(profileData);
   } catch (error) {
     console.log("profile not");
@@ -155,7 +154,7 @@ app.get("/user/profile", authRoute, async (req, res) => {
 app.get("/user/bookings", authRoute, async (req, res) => {
   try {
     let bookings = await bookedData.find({ userId: req.user.userId });
-    console.log(bookings);
+
     res.status(201).json(bookings);
   } catch (error) {
     res.status(400).json({ message: "no any bookings" });
@@ -210,7 +209,17 @@ app.get("/user/events", authRoute, async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-  res.json();
+});
+app.post("/user/logout", (req, res) => {
+  res.cookie("userToken", "", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+    expires: new Date(0),
+  });
+
+  res.json("removed");
 });
 
 // ! get Tour api
