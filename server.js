@@ -109,6 +109,10 @@ let authRoute = (req, res, next) => {
 // ! Protected Route
 // Store Bookings
 app.post("/user/book", authRoute, async (req, res) => {
+   let checkMaxLimit = await bookedData.find({ userId: req.user.userId });
+  if (checkMaxLimit.length >= 2) {
+    return res.json({ message: "length is full" });
+  }
   try {
     let {
       airline,
@@ -136,7 +140,7 @@ app.post("/user/book", authRoute, async (req, res) => {
       stops: stops,
     });
     
-    res.status(201).json("working");
+    res.status(201).json(bookedF);
   } catch (error) {
     console.log(error);
   }
